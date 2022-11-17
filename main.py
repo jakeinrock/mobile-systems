@@ -28,9 +28,12 @@ class MainScreen(GridLayout):
         self.add_widget(MDLabel(text='CPU'))
         self.cpuValues = CpuWidget()
         self.add_widget(self.cpuValues)
-        self.add_widget(MDLabel(text='Battery'))
-        self.password = BatteryCapacity()
-        self.add_widget(self.password)
+        self.add_widget(MDLabel(text='Battery capacity'))
+        self.battery_capacity = BatteryCapacity()
+        self.add_widget(self.battery_capacity)
+        self.add_widget(MDLabel(text='Battery status'))
+        self.battery_state = BatteryState()
+        self.add_widget(self.battery_state)
         self.OCRButton = Button(text= "OCR Not implemented")
         self.add_widget(self.OCRButton)
         self.OCRtext = TextInput(multiline=False)
@@ -55,8 +58,9 @@ def get_battery():
 
     while True:
         time.sleep(0.3)
-        battery_state = open("/sys/class/power_supply/BAT0/status", "r").readline().strip()
-        battery_capacity = open("/sys/class/power_supply/BAT0/capacity", "r").readline().strip()
+        current_status = psutil.sensors_battery()
+        battery_state = "Charging" if current_status.power_plugged else "Discharging"
+        battery_capacity = f"{current_status.percent}"
         if stop_threads:
             print("stop")
             break
